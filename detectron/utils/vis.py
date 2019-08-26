@@ -252,7 +252,7 @@ def vis_one_image_opencv(
 
 def vis_one_image(
         im, im_name, output_dir, boxes, segms=None, keypoints=None, thresh=0.9,
-        kp_thresh=2, dpi=200, box_alpha=0.0, dataset=None, show_class=False,
+        kp_thresh=2, dpi=200, box_alpha=0.0, dataset=None, show_class=False, show_bbox=False,
         ext='pdf', out_when_no_box=False):
     """Visual debugging of detections."""
     if not os.path.exists(output_dir):
@@ -281,7 +281,7 @@ def vis_one_image(
     ax = plt.Axes(fig, [0., 0., 1., 1.])
     ax.axis('off')
     fig.add_axes(ax)
-    ax.imshow(im)
+    ##ax.imshow(im)
 
     if boxes is None:
         sorted_inds = [] # avoid crash when 'boxes' is None
@@ -298,12 +298,13 @@ def vis_one_image(
             continue
 
         # show box (off by default)
-        ax.add_patch(
-            plt.Rectangle((bbox[0], bbox[1]),
-                          bbox[2] - bbox[0],
-                          bbox[3] - bbox[1],
-                          fill=False, edgecolor='g',
-                          linewidth=0.5, alpha=box_alpha))
+        if show_bbox:
+			ax.add_patch(
+				plt.Rectangle((bbox[0], bbox[1]),
+							  bbox[2] - bbox[0],
+							  bbox[3] - bbox[1],
+							  fill=False, edgecolor='g',
+							  linewidth=0.5, alpha=box_alpha))
 
         if show_class:
             ax.text(
