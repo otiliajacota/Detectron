@@ -281,7 +281,7 @@ def vis_one_image(
     ax = plt.Axes(fig, [0., 0., 1., 1.])
     ax.axis('off')
     fig.add_axes(ax)
-    ##ax.imshow(im)
+    ax.imshow(im)
 
     if boxes is None:
         sorted_inds = [] # avoid crash when 'boxes' is None
