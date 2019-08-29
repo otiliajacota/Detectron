@@ -253,7 +253,7 @@ def vis_one_image_opencv(
 def vis_one_image(
         im, im_name, output_dir, boxes, segms=None, keypoints=None, thresh=0.9,
         kp_thresh=2, dpi=200, box_alpha=0.0, dataset=None, show_class=False, show_bbox=False,
-        ext='pdf', out_when_no_box=False):
+        ext='pdf', out_when_no_box=False, out_class=False):
     """Visual debugging of detections."""
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -282,6 +282,14 @@ def vis_one_image(
     ax.axis('off')
     fig.add_axes(ax)
     ax.imshow(im)
+	
+	fig1 = plt.figure(frameon=False)
+    fig1.set_size_inches(im.shape[1] / dpi, im.shape[0] / dpi)
+    ax1 = plt.Axes(fig1, [0., 0., 1., 1.])
+    ax1.axis('off')
+    fig1.add_axes(ax)
+    cl = np.ones(im.shape)
+	ax1.imshow(cl)
 
     if boxes is None:
         sorted_inds = [] # avoid crash when 'boxes' is None
@@ -339,6 +347,26 @@ def vis_one_image(
                     edgecolor='w', linewidth=1.2,
                     alpha=0.5)
                 ax.add_patch(polygon)
+			
+			if out_class:
+				img2 = np.ones(cl.shape)
+				color_mask1 = i
+
+				for c in range(3):
+					color_mask1[c] = i
+				for c in range(3):
+					img[:, :, c] = color_mask1[c]
+				e1 = masks[:, :, i]
+
+				_, contour, hier = cv2.findContours(
+					e1.copy(), cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
+
+				for c in contour:
+					polygon = Polygon(
+						c.reshape((-1, 2)),
+						fill=True, facecolor=color_mask,
+						edgecolor='w', linewidth=1.2)
+					ax1.add_patch(polygon)
 
         # show keypoints
         if keypoints is not None and len(keypoints) > i:
@@ -392,4 +420,6 @@ def vis_one_image(
 
     output_name = os.path.basename(im_name) + '.' + ext
     fig.savefig(os.path.join(output_dir, '{}'.format(output_name)), dpi=dpi)
+	output_name1 = os.path.basename(im_name) + 'class' + '.' + ext
+    fig1.savefig(os.path.join(output_dir, '{}'.format(output_name1)), dpi=dpi)
     plt.close('all')
