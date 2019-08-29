@@ -354,7 +354,7 @@ def vis_one_image(
 
                 for c in range(3):
                     color_mask1[c] = i
-				for c in range(3):
+                for c in range(3):
                     img[:, :, c] = color_mask1[c]
 				e1 = masks[:, :, i]
 
