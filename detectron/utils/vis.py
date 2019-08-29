@@ -283,13 +283,13 @@ def vis_one_image(
     fig.add_axes(ax)
     ax.imshow(im)
 	
-	fig1 = plt.figure(frameon=False)
+    cl = np.ones(im.shape)
+    fig1 = plt.figure(frameon=False)
     fig1.set_size_inches(im.shape[1] / dpi, im.shape[0] / dpi)
     ax1 = plt.Axes(fig1, [0., 0., 1., 1.])
     ax1.axis('off')
-    fig1.add_axes(ax)
-    cl = np.ones(im.shape)
-	ax1.imshow(cl)
+    fig1.add_axes(ax1)
+    ax1.imshow(cl)
 
     if boxes is None:
         sorted_inds = [] # avoid crash when 'boxes' is None
