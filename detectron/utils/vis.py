@@ -348,25 +348,25 @@ def vis_one_image(
                     alpha=0.5)
                 ax.add_patch(polygon)
 			
-			if out_class:
-				img2 = np.ones(cl.shape)
-				color_mask1 = i
+            if out_class:
+                img2 = np.ones(cl.shape)
+                color_mask1 = i
 
+                for c in range(3):
+                    color_mask1[c] = i
 				for c in range(3):
-					color_mask1[c] = i
-				for c in range(3):
-					img[:, :, c] = color_mask1[c]
+                    img[:, :, c] = color_mask1[c]
 				e1 = masks[:, :, i]
 
-				_, contour, hier = cv2.findContours(
-					e1.copy(), cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
+                _, contour, hier = cv2.findContours(
+                    e1.copy(), cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
 
-				for c in contour:
-					polygon = Polygon(
-						c.reshape((-1, 2)),
-						fill=True, facecolor=color_mask,
-						edgecolor='w', linewidth=1.2)
-					ax1.add_patch(polygon)
+                for c in contour:
+                    polygon = Polygon(
+                        c.reshape((-1, 2)),
+                        fill=True, facecolor=color_mask,
+                        edgecolor='w', linewidth=1.2)
+                    ax1.add_patch(polygon)
 
         # show keypoints
         if keypoints is not None and len(keypoints) > i:
