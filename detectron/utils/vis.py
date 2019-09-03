@@ -283,7 +283,7 @@ def vis_one_image(
     fig.add_axes(ax)
     ax.imshow(im)
 	
-    cl = np.ones(im.shape)
+    cl = np.zeros(im.shape)
     fig1 = plt.figure(frameon=False)
     fig1.set_size_inches(im.shape[1] / dpi, im.shape[0] / dpi)
     ax1 = plt.Axes(fig1, [0., 0., 1., 1.])
@@ -355,8 +355,8 @@ def vis_one_image(
                 for c in range(3):
                     color_mask1[c] = i
                 for c in range(3):
-                    img[:, :, c] = color_mask1[c]
-				e1 = masks[:, :, i]
+                    img2[:, :, c] = color_mask1[c]
+                e1 = masks[:, :, i]
 
                 _, contour, hier = cv2.findContours(
                     e1.copy(), cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
@@ -364,7 +364,7 @@ def vis_one_image(
                 for c in contour:
                     polygon = Polygon(
                         c.reshape((-1, 2)),
-                        fill=True, facecolor=color_mask,
+                        fill=True, facecolor=color_mask1,
                         edgecolor='w', linewidth=1.2)
                     ax1.add_patch(polygon)
 
@@ -420,6 +420,6 @@ def vis_one_image(
 
     output_name = os.path.basename(im_name) + '.' + ext
     fig.savefig(os.path.join(output_dir, '{}'.format(output_name)), dpi=dpi)
-	output_name1 = os.path.basename(im_name) + 'class' + '.' + ext
+    output_name1 = os.path.basename(im_name) + 'class' + '.' + ext
     fig1.savefig(os.path.join(output_dir, '{}'.format(output_name1)), dpi=dpi)
     plt.close('all')
