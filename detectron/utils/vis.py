@@ -252,8 +252,8 @@ def vis_one_image_opencv(
 
 def vis_one_image(
         im, im_name, output_dir, boxes, segms=None, keypoints=None, thresh=0.9,
-        kp_thresh=2, dpi=200, box_alpha=0.0, dataset=None, show_class=False, show_bbox=False,
-        ext='pdf', out_when_no_box=False, out_class=False):
+        kp_thresh=2, dpi=200, box_alpha=0.0, dataset=None, show_class=False,
+        ext='pdf', out_when_no_box=False):
     """Visual debugging of detections."""
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -282,14 +282,19 @@ def vis_one_image(
     ax.axis('off')
     fig.add_axes(ax)
     ax.imshow(im)
-	
-    cl = np.zeros(im.shape)
-    fig1 = plt.figure(frameon=False)
-    fig1.set_size_inches(im.shape[1] / dpi, im.shape[0] / dpi)
-    ax1 = plt.Axes(fig1, [0., 0., 1., 1.])
-    ax1.axis('off')
-    fig1.add_axes(ax1)
-    ax1.imshow(cl)
+
+######
+    height, width = im.shape[:2]
+    #mask_instance = np.zeros((height, width, 1), np.uint16)	    
+    intstanceNo = np.zeros(81)
+
+    output_name = os.path.basename(im_name)
+    out_name_img = '/home/otiliajacota/detectron/demo/KITTI2/results/pred_img/'
+    file_name = os.path.splitext(output_name)[0]
+    out_name_list = '/home/otiliajacota/detectron/demo/KITTI2/results/pred_list/' + file_name + '.txt'
+    f = open(out_name_list, 'w+')
+    instancesPerImg = 0
+######
 
     if boxes is None:
         sorted_inds = [] # avoid crash when 'boxes' is None
@@ -306,13 +311,12 @@ def vis_one_image(
             continue
 
         # show box (off by default)
-        if show_bbox:
-			ax.add_patch(
-				plt.Rectangle((bbox[0], bbox[1]),
-							  bbox[2] - bbox[0],
-							  bbox[3] - bbox[1],
-							  fill=False, edgecolor='g',
-							  linewidth=0.5, alpha=box_alpha))
+        ax.add_patch(
+            plt.Rectangle((bbox[0], bbox[1]),
+                          bbox[2] - bbox[0],
+                          bbox[3] - bbox[1],
+                          fill=False, edgecolor='g',
+                          linewidth=0.5, alpha=box_alpha))
 
         if show_class:
             ax.text(
@@ -327,6 +331,7 @@ def vis_one_image(
         # show mask
         if segms is not None and len(segms) > i:
             img = np.ones(im.shape)
+            mask_instance = np.zeros((height, width, 1), np.uint16)
             color_mask = color_list[mask_color_id % len(color_list), 0:3]
             mask_color_id += 1
 
@@ -337,7 +342,7 @@ def vis_one_image(
                 img[:, :, c] = color_mask[c]
             e = masks[:, :, i]
 
-            _, contour, hier = cv2.findContours(
+            contour, hier = cv2.findContours(
                 e.copy(), cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
 
             for c in contour:
@@ -347,26 +352,58 @@ def vis_one_image(
                     edgecolor='w', linewidth=1.2,
                     alpha=0.5)
                 ax.add_patch(polygon)
-			
-            if out_class:
-                img2 = np.ones(cl.shape)
-                color_mask1 = i
 
-                for c in range(3):
-                    color_mask1[c] = i
-                for c in range(3):
-                    img2[:, :, c] = color_mask1[c]
-                e1 = masks[:, :, i]
+                classIdKitti = 0 
+                   
+                intstanceNo[classes[i]] += 1 
+                if classes[i] == 1:
+                    classIdKitti = 24
 
-                _, contour, hier = cv2.findContours(
-                    e1.copy(), cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
+                if classes[i] == 2:
+                    classIdKitti = 33     
 
-                for c in contour:
-                    polygon = Polygon(
-                        c.reshape((-1, 2)),
-                        fill=True, facecolor=color_mask1,
-                        edgecolor='w', linewidth=1.2)
-                    ax1.add_patch(polygon)
+                if classes[i] == 3:
+                    classIdKitti = 26     
+
+                if classes[i] == 4:
+                    classIdKitti = 32     
+
+                if classes[i] == 6:
+                    classIdKitti = 28     
+
+                if classes[i] == 7:
+                    classIdKitti = 31     
+
+                if classes[i] == 8:
+                    classIdKitti = 27     
+
+                if classes[i] == 10:
+                    classIdKitti = 19     
+
+                if classes[i] == 12 or classes[i] == 13:
+                    classIdKitti = 20 
+
+                labelId = classIdKitti
+                labelId *= 256
+                labelId += intstanceNo[classes[i]]
+
+                instancesPerImg += 1
+
+                idx = np.nonzero( masks[..., i])
+                mask_instance[idx[0], idx[1], :] = labelId
+
+
+                rel_path = '../pred_img/' + file_name + '_' + str(instancesPerImg).zfill(3) +'.png' 
+                label_pred = str(classIdKitti).zfill(3)
+                confidence_pred = score    
+                f.write(rel_path + ' ')
+                f.write(label_pred+ ' ')
+                f.write('{0:.16f}'.format(confidence_pred) + '\n')
+
+                image_name = out_name_img + file_name+ "_" + str(instancesPerImg).zfill(3) + ".png"
+
+                cv2.imwrite(image_name, mask_instance)
+
 
         # show keypoints
         if keypoints is not None and len(keypoints) > i:
@@ -418,8 +455,12 @@ def vis_one_image(
                     line, color=colors[len(kp_lines) + 1], linewidth=1.0,
                     alpha=0.7)
 
+   
+
     output_name = os.path.basename(im_name) + '.' + ext
+    #out_name = '/home/otiliajacota/detectron/demo/KITTI/results/pred_img/' + output_name
+    #cv2.imwrite(out_name, mask_instance)
+    #cv2.imwrite(os.path.join(output_dir, '{}'.format(output_name), mask_instance)
+    f.close()
     fig.savefig(os.path.join(output_dir, '{}'.format(output_name)), dpi=dpi)
-    output_name1 = os.path.basename(im_name) + 'class' + '.' + ext
-    fig1.savefig(os.path.join(output_dir, '{}'.format(output_name1)), dpi=dpi)
     plt.close('all')
