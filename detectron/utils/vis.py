@@ -289,9 +289,11 @@ def vis_one_image(
     intstanceNo = np.zeros(81)
 
     output_name = os.path.basename(im_name)
-    out_name_img = '/home/otiliajacota/detectron/demo/KITTI2/results/pred_img/'
+    #out_name_img = '/home/otiliajacota/detectron/demo/KITTI2/results/pred_img/'
+    out_name_img = '/content/Detectron/demo/Kitti/results/pred_img/'
     file_name = os.path.splitext(output_name)[0]
-    out_name_list = '/home/otiliajacota/detectron/demo/KITTI2/results/pred_list/' + file_name + '.txt'
+    #out_name_list = '/home/otiliajacota/detectron/demo/KITTI2/results/pred_list/' + file_name + '.txt'
+    out_name_list = '/content/Detectron/demo/Kitti/results/pred_list/' + file_name + '.txt'
     f = open(out_name_list, 'w+')
     instancesPerImg = 0
 ######
@@ -342,7 +344,7 @@ def vis_one_image(
                 img[:, :, c] = color_mask[c]
             e = masks[:, :, i]
 
-            contour, hier = cv2.findContours(
+            _, contour, hier = cv2.findContours(
                 e.copy(), cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
 
             for c in contour:
