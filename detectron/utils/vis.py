@@ -289,10 +289,10 @@ def vis_one_image(
     intstanceNo = np.zeros(81)
 
     output_name = os.path.basename(im_name)
-    #out_name_img = '/home/otiliajacota/detectron/demo/KITTI2/results/pred_img/'
     out_name_img = '/content/Detectron/demo/Kitti/results/pred_img/'
+    #out_name_img = '/home/otiliajacota/detectron/demo/KITTI/results/pred_img/'
     file_name = os.path.splitext(output_name)[0]
-    #out_name_list = '/home/otiliajacota/detectron/demo/KITTI2/results/pred_list/' + file_name + '.txt'
+    #out_name_list = '/home/otiliajacota/detectron/demo/KITTI/results/pred_list/' + file_name + '.txt'
     out_name_list = '/content/Detectron/demo/Kitti/results/pred_list/' + file_name + '.txt'
     f = open(out_name_list, 'w+')
     instancesPerImg = 0
@@ -344,7 +344,7 @@ def vis_one_image(
                 img[:, :, c] = color_mask[c]
             e = masks[:, :, i]
 
-            _, contour, hier = cv2.findContours(
+            contour, hier = cv2.findContours(
                 e.copy(), cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
 
             for c in contour:
@@ -402,7 +402,7 @@ def vis_one_image(
                 f.write(label_pred+ ' ')
                 f.write('{0:.16f}'.format(confidence_pred) + '\n')
 
-                image_name = out_name_img + file_name+ "_" + str(instancesPerImg).zfill(3) + ".png"
+               	image_name = out_name_img + file_name+ "_" + str(instancesPerImg).zfill(3) + ".png"
 
                 cv2.imwrite(image_name, mask_instance)
 
@@ -460,8 +460,8 @@ def vis_one_image(
    
 
     output_name = os.path.basename(im_name) + '.' + ext
-    #out_name = '/home/otiliajacota/detectron/demo/KITTI/results/pred_img/' + output_name
-    #cv2.imwrite(out_name, mask_instance)
+   # out_name = '/home/otiliajacota/detectron/demo/KITTI/results/pred_img/' + output_name
+   # cv2.imwrite(out_name, mask_instance)
     #cv2.imwrite(os.path.join(output_dir, '{}'.format(output_name), mask_instance)
     f.close()
     fig.savefig(os.path.join(output_dir, '{}'.format(output_name)), dpi=dpi)
